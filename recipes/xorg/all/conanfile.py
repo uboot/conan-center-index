@@ -2,6 +2,7 @@ from conan import ConanFile
 from conan.tools.gnu import PkgConfig
 from conan.tools.system import package_manager
 from conan.errors import ConanInvalidConfiguration
+import os
 
 required_conan_version = ">=1.50.0"
 
@@ -70,6 +71,9 @@ class XorgConan(ConanFile):
                            "libxdamage", "libxdmcp", "libxtst", "libxinerama", "libxkbfile", "libxrandr", "libxres",
                            "libXScrnSaver", "libxvmc", "xcb-util-wm", "xcb-util-image", "xcb-util-keysyms", "xcb-util-renderutil",
                            "libxxf86vm", "libxv", "xkeyboard-config", "xcb-util", "xcb-util-cursor"], update=True, check=True)
+
+    def package(self):
+         os.makedirs(os.path.join(self.package_folder, "include"))
 
     def package_info(self):
         for name in ["x11", "x11-xcb", "fontenc", "ice", "sm", "xau", "xaw7",

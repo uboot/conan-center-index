@@ -72,10 +72,10 @@ class GStPluginsBaseConan(ConanFile):
         return self.settings.compiler == "Visual Studio"
 
     def validate(self):
-        if not self.options["glib"].shared and self.options.shared:
+        if not self.dependencies["glib"].options.shared and self.options.shared:
             # https://gitlab.freedesktop.org/gstreamer/gst-build/-/issues/133
             raise ConanInvalidConfiguration("shared GStreamer cannot link to static GLib")
-        if self.options.shared != self.options["gstreamer"].shared:
+        if self.options.shared != self.dependencies["gstreamer"].options.shared:
             # https://gitlab.freedesktop.org/gstreamer/gst-build/-/issues/133
             raise ConanInvalidConfiguration("GStreamer and GstPlugins must be either all shared, or all static")
         if Version(self.version) >= "1.18.2" and\
@@ -108,7 +108,7 @@ class GStPluginsBaseConan(ConanFile):
         basic_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("zlib/1.2.12")
+        self.requires("zlib/1.2.13")
         self.requires("glib/2.77.0")
         self.requires("gstreamer/1.22.6")
         if self.options.get_safe("with_libalsa"):
@@ -128,7 +128,7 @@ class GStPluginsBaseConan(ConanFile):
             if self.options.with_graphene:
                 self.requires("graphene/1.10.8")
             if self.options.with_libpng:
-                self.requires("libpng/1.6.37")
+                self.requires("libpng/1.6.40")
             if self.options.with_libjpeg == "libjpeg":
                 self.requires("libjpeg/9d")
             elif self.options.with_libjpeg == "libjpeg-turbo":
@@ -145,16 +145,16 @@ class GStPluginsBaseConan(ConanFile):
             self.requires("pango/1.49.3")
 
     def build_requirements(self):
-        self.build_requires("meson/0.61.2")
+        self.tool_requires("meson/0.61.2")
         if not self.conf.get("tools.gnu:pkg_config", default=False, check_type=str):
-            self.build_requires("pkgconf/1.7.4")
+            self.tool_requires("pkgconf/1.7.4")
         if self.settings.os == 'Windows':
-            self.build_requires("winflexbison/2.5.24")
+            self.tool_requires("winflexbison/2.5.24")
         else:
-            self.build_requires("bison/3.7.6")
-            self.build_requires("flex/2.6.4")
+            self.tool_requires("bison/3.7.6")
+            self.tool_requires("flex/2.6.4")
         if self.options.with_introspection:
-            self.build_requires("gobject-introspection/1.70.0")
+            self.tool_requires("gobject-introspection/1.70.0")
 
     def source(self):
         get(**self.conan_data["sources"][self.version],
