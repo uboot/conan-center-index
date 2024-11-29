@@ -1,9 +1,15 @@
 sources:
   # Newer versions at the top
+  "1.24.7":
+    url:
+    - "https://github.com/GStreamer/gstreamer/archive/refs/tags/1.24.7.tar.gz"
+    sha256: "2dd9d65e028273ffec3749253f12d0b678640281bf7af97a6eb53d7e4e9301c3"
   "1.24.3":
     url:
     - "https://github.com/GStreamer/gstreamer/archive/refs/tags/1.24.3.tar.gz"
     sha256: "ed10e1ce7144ed1791712d32afa485423015b5264f05280653b37724fe382089"
 patches:
+  "1.24.7":
+    - patch_file: "patches/0001-Add-support-for-conan.patch"
   "1.24.3":
     - patch_file: "patches/0001-Add-support-for-conan.patch"
