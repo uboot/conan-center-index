@@ -217,6 +217,7 @@ class PackageConan(ConanFile):
         "with_coretracers": [True, False],
 
         "with_tools": [True, False],
+        "with_qt6": [True, False],
 
         "gst_base_audioresample_format": ["auto", "int", "float"],
         "gst_base_gl_jpeg": ["disabled", "libjpeg", "libjpeg-turbo"],
@@ -248,6 +249,7 @@ class PackageConan(ConanFile):
         "with_coretracers": False,
 
         "with_tools": False, # Fails on windows due to LNK1170: line in command file contains maximum-length or more characters
+        "with_qt6": True,
 
         "gst_base_audioresample_format": "auto",
         "gst_base_gl_jpeg": "libjpeg",
@@ -328,6 +330,9 @@ class PackageConan(ConanFile):
 
         if self.options.with_libav:
             self.requires("ffmpeg/6.1", transitive_headers=True, transitive_libs=True)
+
+        if self.options.with_qt6:
+            self.requires("qt/6.7.3")
 
         if self.options.get_safe("gst_base_alsa") and self.options.get_safe("with_alsa"):
             self.requires("libalsa/1.2.10")
@@ -532,6 +537,7 @@ class PackageConan(ConanFile):
         tc.project_options["orc"] = "enabled" if self.options.get_safe('with_orc') else "disabled"
 
         tc.project_options["tools"] = "enabled" if self.options.with_tools else "disabled"
+        tc.project_options["qt6"] = "enabled" if self.options.with_qt6 else "disabled"
 
         if self.settings.compiler == "msvc":
             tc.project_options["c_args"] = "-%s" % self.settings.compiler.runtime
@@ -804,6 +810,10 @@ class PackageConan(ConanFile):
                     elif lib is "y4m": self._add_plugin_components("y4menc")
                     else:
                         self._add_plugin_components(lib)
+
+            # good plugins with external dependencies
+            if self.options.get_safe('with_qt6'):
+                self._add_plugin_components("qml6", ["qt::qt"])
 
         if self.options.with_bad:
             for lib in GST_BAD_MESON_OPTIONS:
