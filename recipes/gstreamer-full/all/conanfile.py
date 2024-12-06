@@ -107,6 +107,9 @@ GST_GOOD_MESON_OPTIONS = {
     'wavparse',
     'xingmux',
     'y4m',
+
+    # options which require external dependencies
+    'vpx',
 }
 
 GST_BAD_MESON_OPTIONS = {
@@ -367,6 +370,11 @@ class PackageConan(ConanFile):
                 self.requires("libjpeg/9e")
             elif self.options.get_safe("gst_base_gl_jpeg") == "libjpeg-turbo":
                 self.requires("libjpeg-turbo/3.0.2")
+
+        if self.options.get_safe("with_good"):
+            if self.options.get_safe("gst_good_vpx"):
+                self.requires("libvpx/1.14.1")
+
 
     def validate(self):
         # TODO validate if still the case
