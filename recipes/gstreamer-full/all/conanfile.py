@@ -191,6 +191,9 @@ GST_UGLY_MESON_OPTIONS = {
     'dvdlpcmdec',
     'dvdsub',
     'realmedia',
+
+    # options which require external dependencies
+    'x264',
 }
 
 GST_RTSP_SERVER_MESON_OPTIONS = {
@@ -221,6 +224,7 @@ class PackageConan(ConanFile):
 
         "with_tools": [True, False],
         "with_qt6": [True, False],
+        "with_gpl": [True, False],
 
         "gst_base_audioresample_format": ["auto", "int", "float"],
         "gst_base_gl_jpeg": ["disabled", "libjpeg", "libjpeg-turbo"],
@@ -253,6 +257,7 @@ class PackageConan(ConanFile):
 
         "with_tools": False, # Fails on windows due to LNK1170: line in command file contains maximum-length or more characters
         "with_qt6": True,
+        "with_gpl": False,
 
         "gst_base_audioresample_format": "auto",
         "gst_base_gl_jpeg": "libjpeg",
@@ -374,6 +379,10 @@ class PackageConan(ConanFile):
         if self.options.get_safe("with_good"):
             if self.options.get_safe("gst_good_vpx"):
                 self.requires("libvpx/1.14.1")
+
+        if self.options.get_safe("with_ugly"):
+            if self.options.get_safe("gst_ugly_x264"):
+                self.requires("libx264/cci.20240224")
 
 
     def validate(self):
@@ -546,6 +555,7 @@ class PackageConan(ConanFile):
 
         tc.project_options["tools"] = "enabled" if self.options.with_tools else "disabled"
         tc.project_options["qt6"] = "enabled" if self.options.with_qt6 else "disabled"
+        tc.project_options["gpl"] = "enabled" if self.options.with_gpl else "disabled"
 
         if self.settings.compiler == "msvc":
             tc.project_options["c_args"] = "-%s" % self.settings.compiler.runtime
