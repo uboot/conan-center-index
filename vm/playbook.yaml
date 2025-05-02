@@ -1,0 +1,60 @@
+- name: Provision Conan VM
+  hosts: vm
+  tasks:
+  - name: Ping my hosts
+    ansible.windows.win_ping:
+  - name: Install Git
+    chocolatey.chocolatey.win_chocolatey:
+      name: git
+      package_params: "/NoCredentialManager"
+    register: git
+  - name: Install Build Tools
+    chocolatey.chocolatey.win_chocolatey:
+      name: visualstudio2022buildtools
+    register: build_tools
+  - name: Install Python
+    chocolatey.chocolatey.win_chocolatey:
+      name: python
+    register: python
+  - name: Install CMake
+    chocolatey.chocolatey.win_chocolatey:
+      name: cmake
+      version: '3.31.7'
+    register: cmake
+  - name: Install Visual Studio Code
+    chocolatey.chocolatey.win_chocolatey:
+      name: vscode.install
+  - name: Reboot
+    ansible.windows.win_reboot:
+    when: git.changed or build_tools.changed or python.changed or cmake.changed
+  - name: Disable Realtime Monitoring
+    ansible.windows.win_powershell:
+      script: |
+        Set-MpPreference -DisableRealtimeMonitoring 1
+  - name: Setup Git Credential Helper
+    ansible.windows.win_command: |
+      git config --global credential.helper 'store'
+  - name: Setup User E-Mail
+    ansible.windows.win_command: |
+      git config --global user.email "{{ git_user_email }}"
+  - name: Setup Git User
+    ansible.windows.win_command: |
+      git config --global user.name "{{ git_user_name }}"
+  - name: Install C++ Workload  
+    chocolatey.chocolatey.win_chocolatey:
+      name: visualstudio2022-workload-vctools
+  - name: Install Conan
+    ansible.windows.win_command: pip install conan==2.21.0
+  - name: Setup Conan
+    ansible.windows.win_command: conan profile detect --force
+  - name: Configure Conan Download Cache
+    community.windows.win_lineinfile:
+      path: C:\Users\azureuser\.conan2\global.conf
+      line: core.sources:download_cache = {{ '{{' }}conan_home_folder{{ '}}' }}/download_cache
+  - name: Check for CCI Repo
+    win_stat: 
+      path: C:\Users\azureuser\conan-center-index
+    register: cci
+  - name: Clone CCI
+    ansible.windows.win_command: git clone https://github.com/uboot/conan-center-index.git --branch gstreamer
+    when: not cci.stat.exists
