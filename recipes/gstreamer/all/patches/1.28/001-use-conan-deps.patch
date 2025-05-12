@@ -1,0 +1,358 @@
+diff --git a/subprojects/gst-plugins-bad/ext/bz2/meson.build b/subprojects/gst-plugins-bad/ext/bz2/meson.build
+index e7d8feb962..e1d86f8398 100644
+--- a/subprojects/gst-plugins-bad/ext/bz2/meson.build
++++ b/subprojects/gst-plugins-bad/ext/bz2/meson.build
+@@ -18,9 +18,9 @@ plugin_sources += {
+   'bz2': pathsep.join(doc_sources)
+ }
+ 
+-bz2_dep = cc.find_library('bz2', required : get_option('bz2'))
++bz2_dep = dependency('bzip2', required : get_option('bz2'))
+ 
+-if bz2_dep.found() and cc.has_header_symbol('bzlib.h', 'BZ2_bzlibVersion')
++if bz2_dep.found()
+   gstbz2 = library('gstbz2',
+     bz2_sources,
+     c_args : gst_plugins_bad_args,
+diff --git a/subprojects/gst-plugins-bad/ext/faac/meson.build b/subprojects/gst-plugins-bad/ext/faac/meson.build
+index cd689416eb..9633f3af30 100644
+--- a/subprojects/gst-plugins-bad/ext/faac/meson.build
++++ b/subprojects/gst-plugins-bad/ext/faac/meson.build
+@@ -15,11 +15,8 @@ plugin_sources += {
+   'faac': pathsep.join(doc_sources)
+ }
+ 
+-faac_dep = cc.find_library('faac', required : get_option('faac'))
+-have_faac_h = cc.has_header_symbol('faac.h', 'faacEncOpen')
+-if not have_faac_h and get_option('faac').enabled()
+-  error('faac plugin enabled: found libfaac, but not faac.h')
+-endif
++faac_dep = dependency('faac', required : get_option('faac'))
++have_faac_h = true
+ 
+ if faac_dep.found() and have_faac_h
+   gstfaac = library('gstfaac',
+diff --git a/subprojects/gst-plugins-bad/ext/onnx/meson.build b/subprojects/gst-plugins-bad/ext/onnx/meson.build
+index 656252b775..b0692ff395 100644
+--- a/subprojects/gst-plugins-bad/ext/onnx/meson.build
++++ b/subprojects/gst-plugins-bad/ext/onnx/meson.build
+@@ -24,7 +24,7 @@ extra_args = []
+ extra_deps = []
+ extra_incs = []
+ 
+-onnxrt_dep = dependency('libonnxruntime', version : '>= 1.16.1',
++onnxrt_dep = dependency('onnxruntime', version : '>= 1.16.1',
+ 			required: false)
+ if not onnxrt_dep.found()
+   fsmod = import('fs')
+diff --git a/subprojects/gst-plugins-bad/ext/sctp/meson.build b/subprojects/gst-plugins-bad/ext/sctp/meson.build
+index 9ca55091de..c04366c7c4 100644
+--- a/subprojects/gst-plugins-bad/ext/sctp/meson.build
++++ b/subprojects/gst-plugins-bad/ext/sctp/meson.build
+@@ -27,9 +27,9 @@ endif
+ 
+ sctp_platform_deps = []
+ 
+-found_system_usrsctp = false
++found_system_usrsctp = true
+ 
+-if not get_option('sctp-internal-usrsctp').enabled()
++if false
+   sctp_dep = cc.find_library('usrsctp', required: false)
+   sctp_header = cc.has_header('usrsctp.h')
+   if host_system == 'windows'
+@@ -58,13 +58,14 @@ if not found_system_usrsctp
+   endif
+ endif
+ 
+-if not gst_debug_disabled
++if false
+   sctp_args = ['-DSCTP_DEBUG']
+ else
+   sctp_args = []
+ endif
+ 
+-if sctp_dep.found() and sctp_header
++sctp_dep = dependency('usrsctp', required: true)
++if sctp_dep.found()
+   gstsctp = library('gstsctp',
+     sctp_sources,
+     c_args : gst_plugins_bad_args + sctp_args,
+diff --git a/subprojects/gst-plugins-bad/ext/sctp/usrsctp/meson.build b/subprojects/gst-plugins-bad/ext/sctp/usrsctp/meson.build
+index 4c0268ce0c..6ea4ca3060 100644
+--- a/subprojects/gst-plugins-bad/ext/sctp/usrsctp/meson.build
++++ b/subprojects/gst-plugins-bad/ext/sctp/usrsctp/meson.build
+@@ -147,9 +147,6 @@ endif
+ if false
+     compile_args += ['-DINVARIANTS']
+ endif
+-if not gst_debug_disabled
+-    compile_args += ['-DSCTP_DEBUG']
+-endif
+ # We do not need the socket API in GStreamer since we will wrap inside a
+ # DTLS packet anyway, because we use SCTP for WebRTC data channels.
+ if false
+diff --git a/subprojects/gst-plugins-bad/gst-libs/gst/vulkan/meson.build b/subprojects/gst-plugins-bad/gst-libs/gst/vulkan/meson.build
+index 5892d16309..ea2a099d0f 100644
+--- a/subprojects/gst-plugins-bad/gst-libs/gst/vulkan/meson.build
++++ b/subprojects/gst-plugins-bad/gst-libs/gst/vulkan/meson.build
+@@ -126,7 +126,7 @@ if host_system == 'darwin'
+     # We need this to find libMoltenVK.dylib when installed
+     vulkan_plugin_kwargs += {'install_rpath': '@loader_path/..'}
+   endif
+-elif host_system == 'windows'
++elif false
+   vulkan_root = run_command(python3, '-c', 'import os; print(os.environ.get("VK_SDK_PATH"))', check: false).stdout().strip()
+   if vulkan_root != '' and vulkan_root != 'None'
+     vulkan_lib_dir = ''
+@@ -156,8 +156,8 @@ else
+   endif
+ endif
+ 
+-if host_system != 'windows'
+-  has_vulkan_header = cc.has_header('vulkan/vulkan_core.h', dependencies: vulkan_dep, required: vulkan_opt)
++if true
++    has_vulkan_header = true
+ endif
+ 
+ if 'x11' in vulkan_windowing_opt or 'auto' in vulkan_windowing_opt
+@@ -281,7 +281,7 @@ if host_system == 'windows'
+   gdi_dep = cc.find_library('gdi32', required : vulkan_opt)
+ 
+   # Cannot use internal dependency object with cc.has_header()
+-  if gdi_dep.found() and cc.has_header('vulkan/vulkan_win32.h', args: '-I' + vulkan_inc_dir, required: vulkan_opt)
++  if gdi_dep.found() and cc.has_header('vulkan/vulkan_win32.h', dependencies : vulkan_dep, required: vulkan_opt)
+     vulkan_priv_sources += ['win32/gstvkwindow_win32.c']
+     optional_deps += [gdi_dep]
+     vulkan_windowing = true
+diff --git a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/meson.build b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/meson.build
+index 9f8b3fbcc1..0f60c67380 100644
+--- a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/meson.build
++++ b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/meson.build
+@@ -13,7 +13,7 @@ libgstwebrtcnice_headers = files([
+ 
+ libgstwebrtcnice_dep = dependency('', required : false)
+ 
+-libnice_dep = dependency('nice', version : '>=0.1.23', required : get_option('webrtc'),
++libnice_dep = dependency('libnice', version : '>=0.1.23', required : get_option('webrtc'),
+                          allow_fallback: true, default_options: ['tests=disabled'])
+ 
+ deps = [gstwebrtc_dep, libnice_dep]
+diff --git a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nice.c b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nice.c
+index 35f74435d5..2327e71bd0 100644
+--- a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nice.c
++++ b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nice.c
+@@ -25,7 +25,7 @@
+ #include "nicestream.h"
+ #include "niceutils.h"
+ /* libnice */
+-#include <agent.h>
++#include <nice/agent.h>
+ 
+ #define HTTP_PROXY_PORT_DEFAULT 3128
+ #define MAX_CLOSING_TIME_MILLI_SECONDS 2 * 1000 /* limit closing procedure to 2s */
+diff --git a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nicetransport.h b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nicetransport.h
+index 93263a0336..de56a22418 100644
+--- a/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nicetransport.h
++++ b/subprojects/gst-plugins-bad/gst-libs/gst/webrtc/nice/nicetransport.h
+@@ -23,7 +23,7 @@
+ #include "nice.h"
+ #include "gst/webrtc/icetransport.h"
+ /* libnice */
+-#include <agent.h>
++#include <nice/agent.h>
+ 
+ #include "nice_fwd.h"
+ 
+diff --git a/subprojects/gst-plugins-bad/sys/uvcgadget/meson.build b/subprojects/gst-plugins-bad/sys/uvcgadget/meson.build
+index 753fafc388..b69cf51f2c 100644
+--- a/subprojects/gst-plugins-bad/sys/uvcgadget/meson.build
++++ b/subprojects/gst-plugins-bad/sys/uvcgadget/meson.build
+@@ -26,10 +26,8 @@ if get_option('uvcgadget').disabled()
+ else
+   # Should only be built on Linux, check for Linux kernel headers even though
+   # we have our own copy.
+-  have_v4l2 = cc.has_header('linux/videodev2.h') or cc.has_header('sys/videodev2.h') or cc.has_header('sys/videoio.h')
+-  if get_option('uvcgadget').enabled() and not have_v4l2
+-    error('UVCGADGET is requested but kernel headers were not found')
+-  endif
++  libv4l2_dep = dependency('libv4l2', required: get_option('v4l2codecs'))
++  have_v4l2 = true
+ 
+   # Find makedev in various header files. Different operating systems put the
+   # macro in different header files.
+@@ -45,7 +43,7 @@ if have_v4l2 and libgudev_dep.found()
+     c_args : gst_plugins_bad_args,
+     cpp_args: gst_plugins_bad_args,
+     include_directories : [configinc, include_directories('../v4l2codecs')],
+-    dependencies : [gstbase_dep, gstvideo_dep, gstallocators_dep, libgudev_dep, gstpbutils_dep,],
++    dependencies : [gstbase_dep, gstvideo_dep, gstallocators_dep, libgudev_dep, gstpbutils_dep, libv4l2_dep],
+     install : true,
+     install_dir : plugins_install_dir,
+   )
+diff --git a/subprojects/gst-plugins-bad/sys/v4l2codecs/meson.build b/subprojects/gst-plugins-bad/sys/v4l2codecs/meson.build
+index cf655798b6..1fcf02ebfa 100644
+--- a/subprojects/gst-plugins-bad/sys/v4l2codecs/meson.build
++++ b/subprojects/gst-plugins-bad/sys/v4l2codecs/meson.build
+@@ -44,12 +44,8 @@ if get_option('v4l2codecs').disabled()
+   have_v4l2 = false
+   message('V4L2 CODECs plugin is disabled')
+ else
+-  # Should only be built on Linux, check for Linux kernel headers even though
+-  # we have our own copy.
+-  have_v4l2 = cc.has_header('linux/videodev2.h')
+-  if get_option('v4l2codecs').enabled() and not have_v4l2
+-    error('V4L2i CODECs is requested but kernel headers were not found')
+-  endif
++  libv4l2_dep = dependency('libv4l2', required: get_option('v4l2codecs'))
++  have_v4l2 = true
+ 
+   # Find makedev in various header files. Different operating systems put the
+   # macro in different header files.
+@@ -67,7 +63,7 @@ if have_v4l2 and libgudev_dep.found()
+     cpp_args: gst_plugins_bad_args,
+     include_directories : [configinc],
+     dependencies : [gstbase_dep, gstcodecs_dep, gstallocators_dep, libgudev_dep,
+-                   gstpbutils_dep,],
++                   gstpbutils_dep, libv4l2_dep],
+     install : true,
+     install_dir : plugins_install_dir,
+   )
+diff --git a/subprojects/gst-plugins-base/ext/gl/meson.build b/subprojects/gst-plugins-base/ext/gl/meson.build
+index cd6e82e72c..eb906a12c8 100644
+--- a/subprojects/gst-plugins-base/ext/gl/meson.build
++++ b/subprojects/gst-plugins-base/ext/gl/meson.build
+@@ -202,7 +202,7 @@ gstopengl = library('gstopengl',
+   objc_args : gst_plugins_base_args + gl_objc_args + extra_c_args,
+   link_args : noseh_link_args,
+   include_directories : [configinc],
+-  dependencies : [gstgl_dep, video_dep,
++  dependencies : [gl_lib_deps, gstgl_dep, video_dep,
+                   gst_base_dep, gst_controller_dep, libm] + optional_deps,
+   install : true,
+   install_dir : plugins_install_dir)
+diff --git a/subprojects/gst-plugins-base/gst-libs/gst/gl/meson.build b/subprojects/gst-plugins-base/gst-libs/gst/gl/meson.build
+index 22649a20f4..00cd3f29da 100644
+--- a/subprojects/gst-plugins-base/gst-libs/gst/gl/meson.build
++++ b/subprojects/gst-plugins-base/gst-libs/gst/gl/meson.build
+@@ -332,6 +332,16 @@ if gl_header_dep.type_name() == 'internal'
+   compat_includes = subproject('gl-headers').get_variable('compatibility_includes')
+ else
+   compat_includes = []
++  if host_system == 'windows'
++    glext = dependency('glext', required : true)
++    wglext = dependency('wglext', required : true)
++    khrplatform = dependency('khrplatform', required : true)
++    compat_includes = include_directories(
++      glext.get_variable('includedir'),
++      wglext.get_variable('includedir'),
++      khrplatform.get_variable('includedir'),
++    )
++  endif
+ endif
+ 
+ # Desktop OpenGL checks
+diff --git a/subprojects/gst-plugins-good/ext/adaptivedemux2/meson.build b/subprojects/gst-plugins-good/ext/adaptivedemux2/meson.build
+index 27d4840433..5adc5546d8 100644
+--- a/subprojects/gst-plugins-good/ext/adaptivedemux2/meson.build
++++ b/subprojects/gst-plugins-good/ext/adaptivedemux2/meson.build
+@@ -93,6 +93,12 @@ adaptive_headers = [
+   'mss/gstmss-prelude.h',
+ ]
+ 
++adaptivedemux2_opt = get_option('adaptivedemux2')
++if adaptivedemux2_opt.disabled()
++  message('Not building adaptivedemux2 plugin because it was disabled')
++  subdir_done()
++endif
++
+ subdir('hls')
+ 
+ adaptive_sources += hls_sources
+@@ -110,12 +116,6 @@ plugin_sources += {
+ hls_dep = dependency('', required : false)
+ adaptivedemux2_dep = dependency('', required : false)
+ 
+-adaptivedemux2_opt = get_option('adaptivedemux2')
+-if adaptivedemux2_opt.disabled()
+-  message('Not building adaptivedemux2 plugin because it was disabled')
+-  subdir_done()
+-endif
+-
+ if soup_lookup_dep and not libsoup3_dep.found() and not libsoup2_dep.found()
+   if adaptivedemux2_opt.enabled()
+     error(f'adaptivedemux2: Either libsoup2 or libsoup3 is needed')
+diff --git a/subprojects/gst-plugins-good/ext/lame/meson.build b/subprojects/gst-plugins-good/ext/lame/meson.build
+index fd697d6d28..5aeb3e250b 100644
+--- a/subprojects/gst-plugins-good/ext/lame/meson.build
++++ b/subprojects/gst-plugins-good/ext/lame/meson.build
+@@ -37,7 +37,7 @@ else
+   lame_dep = dependency('mp3lame', allow_fallback: true, required: lame_option,
+       include_type: 'system', default_options: ['tools=disabled'])
+   have_lame = lame_dep.found()
+-  lame_extra_c_args += ['-DHAVE_LAME_SET_VBR_QUALITY', '-DGSTLAME_PRESET', '-DLAME_SUBPROJECT']
++  lame_extra_c_args += ['-DHAVE_LAME_SET_VBR_QUALITY', '-DGSTLAME_PRESET']
+ endif
+ 
+ if not have_lame
+diff --git a/subprojects/gst-plugins-good/gst/matroska/meson.build b/subprojects/gst-plugins-good/gst/matroska/meson.build
+index 3dc9292f40..747e608edc 100644
+--- a/subprojects/gst-plugins-good/gst/matroska/meson.build
++++ b/subprojects/gst-plugins-good/gst/matroska/meson.build
+@@ -39,7 +39,7 @@ if get_option('matroska').disabled()
+   subdir_done()
+ endif
+ 
+-bz2_dep = cc.find_library('bz2', required : get_option('bz2'))
++bz2_dep = dependency('bzip2', required : get_option('bz2'))
+ cdata.set('HAVE_BZ2', bz2_dep.found() and cc.has_header('bzlib.h'))
+ 
+ gstmatroska = library('gstmatroska',
+diff --git a/subprojects/gst-plugins-good/sys/v4l2/meson.build b/subprojects/gst-plugins-good/sys/v4l2/meson.build
+index 2d6cbb3451..b90c689d29 100644
+--- a/subprojects/gst-plugins-good/sys/v4l2/meson.build
++++ b/subprojects/gst-plugins-good/sys/v4l2/meson.build
+@@ -88,10 +88,8 @@ if v4l2.disabled()
+   have_v4l2 = false
+   message('V4L2 plugin is disabled')
+ else
+-  have_v4l2 = cc.has_header('linux/videodev2.h') or cc.has_header('sys/videodev2.h') or cc.has_header('sys/videoio.h')
+-  if v4l2.enabled() and not have_v4l2
+-    error('V4L2 is requested but headers were not found')
+-  endif
++  libv4l2_dep = dependency('libv4l2', required: v4l2.enabled())
++  have_v4l2 = true
+ endif
+ 
+ cdata.set('GST_V4L2_ENABLE_PROBE', get_option('v4l2-probe'))
+diff --git a/subprojects/gst-plugins-ugly/ext/x264/gstx264enc.h b/subprojects/gst-plugins-ugly/ext/x264/gstx264enc.h
+index b9c9f8201d..91e6f8bd87 100644
+--- a/subprojects/gst-plugins-ugly/ext/x264/gstx264enc.h
++++ b/subprojects/gst-plugins-ugly/ext/x264/gstx264enc.h
+@@ -31,13 +31,6 @@
+ #include <stdint.h>
+ #endif
+ 
+-/* The x264.h header says this isn't needed with MinGW, but sometimes the
+- * compiler is unable to correctly do the pointer indirection for us, which
+- * leads to a segfault when you try to dereference any const values provided
+- * by x264.dll. See: https://bugzilla.gnome.org/show_bug.cgi?id=779249 */
+-#if defined(_WIN32) && !defined(X264_API_IMPORTS) && !defined(GST_STATIC_COMPILATION)
+-# define X264_API_IMPORTS
+-#endif
+ #include <x264.h>
+ 
+ G_BEGIN_DECLS
+diff --git a/subprojects/gst-plugins-ugly/ext/x264/meson.build b/subprojects/gst-plugins-ugly/ext/x264/meson.build
+index 7beada76d5..bb94cc72cb 100644
+--- a/subprojects/gst-plugins-ugly/ext/x264/meson.build
++++ b/subprojects/gst-plugins-ugly/ext/x264/meson.build
+@@ -22,7 +22,7 @@ plugin_sources += {
+   'x264': pathsep.join(doc_sources)
+ }
+ 
+-x264_dep = dependency('x264', version : '>=0.156', required : x264_opt,
++x264_dep = dependency('x264', required : x264_opt,
+     allow_fallback: true)
+ 
+ if x264_dep.found()
