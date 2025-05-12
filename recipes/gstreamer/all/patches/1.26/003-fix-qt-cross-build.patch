@@ -1,0 +1,93 @@
+diff --git a/subprojects/gst-plugins-bad/ext/qt6d3d11/meson.build b/subprojects/gst-plugins-bad/ext/qt6d3d11/meson.build
+index d1c446b231..70cea71afb 100644
+--- a/subprojects/gst-plugins-bad/ext/qt6d3d11/meson.build
++++ b/subprojects/gst-plugins-bad/ext/qt6d3d11/meson.build
+@@ -43,9 +43,9 @@ endif
+ 
+ qt6_mod = import('qt6')
+ if meson.version().version_compare('>=1.6')
+-  have_tools = qt6_mod.has_tools(method: qt6_method, tools: ['moc', 'uic', 'rcc'])
++  have_tools = qt6_mod.has_tools(method: 'config-tool', tools: ['moc', 'uic', 'rcc'])
+ else
+-  have_tools = qt6_mod.has_tools(method: qt6_method)
++  have_tools = qt6_mod.has_tools(method: 'config-tool')
+ endif
+ if not have_tools
+   if qt6_option.enabled()
+@@ -61,7 +61,7 @@ if not qt6qml_dep.found()
+ endif
+ 
+ have_qt6d3d11 = true
+-moc_files = qt6_mod.preprocess(moc_headers : moc_headers, method: qt6_method)
++moc_files = qt6_mod.preprocess(moc_headers : moc_headers, method: 'config-tool')
+ gstqt6d3d11 = library('gstqt6d3d11', gstqt6d3d11_sources, moc_files,
+   c_args : gst_plugins_bad_args + ['-DGST_USE_UNSTABLE_API'],
+   cpp_args : gst_plugins_bad_args + ['-DGST_USE_UNSTABLE_API'],
+diff --git a/subprojects/gst-plugins-good/ext/qt/meson.build b/subprojects/gst-plugins-good/ext/qt/meson.build
+index 9fcef20bef..0eacaebdc2 100644
+--- a/subprojects/gst-plugins-good/ext/qt/meson.build
++++ b/subprojects/gst-plugins-good/ext/qt/meson.build
+@@ -65,9 +65,9 @@ endif
+ 
+ qt5_mod = import('qt5')
+ if meson.version().version_compare('>=1.6')
+-  have_tools = qt5_mod.has_tools(method: qt5_method, tools: ['moc', 'uic', 'rcc'])
++  have_tools = qt5_mod.has_tools(method: 'config-tool', tools: ['moc', 'uic', 'rcc'])
+ else
+-  have_tools = qt5_mod.has_tools(method: qt5_method)
++  have_tools = qt5_mod.has_tools(method: 'config-tool')
+ endif
+ if not have_tools
+   if qt5_option.enabled()
+@@ -217,7 +217,7 @@ if qt5_option.require(have_qt_windowing, error_message: 'No windowing, enable on
+   endif
+ 
+   # Build it!
+-  moc_files = qt5_mod.preprocess(moc_headers : moc_headers, method: qt5_method)
++  moc_files = qt5_mod.preprocess(moc_headers : moc_headers, method: 'config-tool')
+ 
+   gstqmlgl = library('gstqmlgl', qmlgl_sources, moc_files,
+     cpp_args : gst_plugins_good_args + qt_defines,
+diff --git a/subprojects/gst-plugins-good/ext/qt6/meson.build b/subprojects/gst-plugins-good/ext/qt6/meson.build
+index 79987d8f0f..e95b6ce805 100644
+--- a/subprojects/gst-plugins-good/ext/qt6/meson.build
++++ b/subprojects/gst-plugins-good/ext/qt6/meson.build
+@@ -72,9 +72,9 @@ endif
+ 
+ qt6_mod = import('qt6')
+ if meson.version().version_compare('>=1.6')
+-  have_tools = qt6_mod.has_tools(method: qt6_method, tools: ['moc', 'uic', 'rcc'])
++  have_tools = qt6_mod.has_tools(method: 'config-tool', tools: ['moc', 'uic', 'rcc'])
+ else
+-  have_tools = qt6_mod.has_tools(method: qt6_method)
++  have_tools = qt6_mod.has_tools(method: 'config-tool')
+ endif
+ if not have_tools
+   if qt6_option.enabled()
+@@ -90,7 +90,7 @@ if not qt6qml_dep.found()
+ endif
+ 
+ qt6_bindir = qt6qml_dep.get_variable('bindir', configtool: 'QT_HOST_BINS')
+-qsb = find_program('qsb-qt6', 'qsb', dirs: [qt6_bindir], required: qt6_option)
++qsb = find_program('qsb-qt6', 'qsb', required: qt6_option)
+ if not qsb.found()
+   subdir_done()
+ endif
+@@ -193,7 +193,7 @@ endif
+ 
+ if qt6_option.require(have_qt_windowing, error_message: 'No windowing, enable one of the qt-* windowing options').allowed()
+   # Build it!
+-  moc_files = qt6_mod.preprocess(moc_headers : moc_headers, method: qt6_method)
++  moc_files = qt6_mod.preprocess(moc_headers : moc_headers, method: 'config-tool')
+   # TODO: dist backup qsb shaders?
+   shaders = []
+   foreach shader_source: shader_sources
+@@ -221,7 +221,7 @@ if qt6_option.require(have_qt_windowing, error_message: 'No windowing, enable on
+     endif
+   endforeach
+   resource_file = configure_file(input: 'resources.qrc', output: 'resources.qrc', copy: true)
+-  qresources = qt6_mod.compile_resources(sources: resource_file, method: qt6_method)
++  qresources = qt6_mod.compile_resources(sources: resource_file, method: 'config-tool')
+ 
+   qml6gl_kwargs = {}
+   if host_system == 'darwin'

@@ -1,0 +1,27 @@
+asf:
+  options: 
+    - asfdemux
+  requires:
+    - gstreamer-rtp-1.0
+    - gstreamer-video-1.0
+    - gstreamer-audio-1.0
+    - gstreamer-tag-1.0
+    - gstreamer-riff-1.0
+    - gstreamer-rtsp-1.0
+    - gstreamer-pbutils-1.0
+    - gstreamer-sdp-1.0
+dvdlpcmdec:
+  requires:
+    - gstreamer-audio-1.0
+dvdsub:
+  requires:
+    - gstreamer-video-1.0
+realmedia:
+  requires:
+    - gstreamer-rtsp-1.0
+    - gstreamer-pbutils-1.0
+    - gstreamer-sdp-1.0
+x264:
+  requires:
+    - gstreamer-pbutils-1.0
+    - libx264::libx264
