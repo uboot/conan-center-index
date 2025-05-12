@@ -1,0 +1,26 @@
+[settings]
+os=Linux
+arch=x86_64
+compiler=gcc
+compiler.version=13
+compiler.libcxx=libstdc++11
+compiler.cppstd=17
+build_type=Release
+
+; qt/*:compiler.cppstd=gnu20
+
+[options]
+glib/*:shared=True
+gstreamer/*:shared=True
+gstreamer/*:with_orc=True
+gstreamer/*:i18n=True
+gstreamer/*:with_libdrm=True
+gstreamer/*:dtls=True
+gstreamer/*:sctp=True
+gstreamer/*:srtp=True
+gstreamer/*:webrtc=True
+
+gst-plugins-rs/*:shared=True
+
+ffmpeg/*:with_vaapi=False
+ffmpeg/*:with_freetype=False
