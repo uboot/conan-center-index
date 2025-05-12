@@ -1,0 +1,179 @@
+name: Build GStreamer Packages
+
+on: 
+  push:
+  schedule:
+  - cron: '27 4 */5 * *'
+
+jobs:
+  windows-deps:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conan windows cache
+        uses: actions/cache@v4
+        with:
+          path: C:\p
+          key: windows-deps-${{ github.run_id }}
+          restore-keys: |
+            windows-deps-
+      - run: pip install conan==2.31.1
+      - run: conan config install --type dir conan-config-windows
+      - run: conan remote add cci .
+
+      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing --update
+        # continue-on-error: true
+        # timeout-minutes: 180
+      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
+      - run: conan remove '*' --lru=1d --confirm
+      - run: conan cache clean '*'
+
+      # - run: conan remove 'msys*' --confirm
+      # - run: conan cache save '*:*'
+      # - uses: actions/upload-artifact@v7
+      #   with:
+      #     name: conan-cache-windows
+      #     path: conan_cache_save.tgz
+      #     archive: false
+  
+  windows-build:
+    env:
+      CARGO_HOME: C:\Users\runneradmin\cargo_cache
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        version: ["1.26.11", "1.28.6"]
+        shared: ["True", "False"]
+    needs: windows-deps
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cargo windows cache
+        uses: actions/cache@v4
+        with:
+          path: ~/cargo_cache
+          key: windows-cargo-${{ matrix.version }}-v1
+          restore-keys: |
+            windows-cargo-${{ matrix.version }}-
+      - name: Conan windows cache
+        uses: actions/cache@v4
+        with:
+          path: C:\p
+          key: windows-deps-${{ github.run_id }}
+          restore-keys: |
+            windows-deps-
+      - run: pip install conan==2.31.1
+      - run: conan config install --type dir conan-config-windows
+      - run: conan remote add cci .
+
+      - run: conan install --require gstreamer/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
+      - run: conan test recipes/gstreamer/all/test_package gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
+      - run: conan graph info --require gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} --format html > gstreamer.html
+
+      - run: conan install --require gst-plugins-rs/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
+        if: ${{ matrix.shared == 'True' }}
+      - run: conan test recipes/gst-plugins-rs/all/test_package gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
+        if: ${{ matrix.shared == 'True' }}
+      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
+        if: ${{ matrix.shared == 'True' }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conan-graph-windows-${{ matrix.version }}-${{ matrix.shared }}
+          path: '*.html'
+
+  linux-deps:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conan linux cache
+        uses: actions/cache@v4
+        with:
+          path: ~/conan_cache
+          key: linux-deps-${{ github.run_id }}
+          restore-keys: |
+            linux-deps-
+      - run: sudo apt-get update
+      - run: >
+          sudo apt-get install -y libegl-dev libegl1-mesa-dev libvdpau-dev libx11-dev
+          libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev
+          libxcomposite-dev libxcursor-dev libxdamage-dev libxdmcp-dev libxext-dev
+          libxfixes-dev libxi-dev libxinerama-dev libxkbfile-dev libxmu-dev libxmuu-dev
+          libxpm-dev libxrandr-dev libxrender-dev libxres-dev libxss-dev libxt-dev
+          libxtst-dev libxv-dev libxxf86vm-dev libxcb-glx0-dev libxcb-render0-dev
+          libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev
+          libxcb-keysyms1-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev
+          libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev uuid-dev libxcb-cursor-dev
+          libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxcb-composite0-dev
+          libxcb-ewmh-dev libxcb-res0-dev libxcb-util-dev libxcb-util0-dev libva-dev
+      - run: pip install conan==2.31.1
+      - run: conan config install --type dir conan-config-linux
+      - run: conan remote add cci .
+
+      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing --update
+      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
+      - run: conan remove '*' --lru=1d --confirm
+      - run: conan cache clean '*'
+
+      # - run: conan cache save '*:*'
+      # - uses: actions/upload-artifact@v7
+      #   with:
+      #     name: conan-cache-linux
+      #     path: conan_cache_save.tgz
+      #     archive: false
+
+  linux-build:
+    env:
+      CARGO_HOME: /home/runner/cargo_cache
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        version: ["1.26.11", "1.28.6"]
+        shared: ["True", "False"]
+    needs: linux-deps
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cargo linux cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/cargo_cache
+          key: linux-cargo-${{ matrix.version }}-v1
+          restore-keys: |
+            linux-cargo-${{ matrix.version }}-
+      - name: Conan linux cache
+        uses: actions/cache@v4
+        with:
+          path: ~/conan_cache
+          key: linux-deps-${{ github.run_id }}
+          restore-keys: |
+            linux-deps-
+      - run: sudo apt-get update
+      - run: >
+          sudo apt-get install -y libegl-dev libegl1-mesa-dev libvdpau-dev libx11-dev
+          libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev
+          libxcomposite-dev libxcursor-dev libxdamage-dev libxdmcp-dev libxext-dev
+          libxfixes-dev libxi-dev libxinerama-dev libxkbfile-dev libxmu-dev libxmuu-dev
+          libxpm-dev libxrandr-dev libxrender-dev libxres-dev libxss-dev libxt-dev
+          libxtst-dev libxv-dev libxxf86vm-dev libxcb-glx0-dev libxcb-render0-dev
+          libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev
+          libxcb-keysyms1-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev
+          libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev uuid-dev libxcb-cursor-dev
+          libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxcb-composite0-dev
+          libxcb-ewmh-dev libxcb-res0-dev libxcb-util-dev libxcb-util0-dev libva-dev
+      - run: pip install conan==2.31.1
+      - run: conan config install --type dir conan-config-linux
+      - run: conan remote add cci .
+
+      - run: conan install --require gstreamer/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
+      - run: conan test recipes/gstreamer/all/test_package gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
+      - run: conan graph info --require gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} --format html > gstreamer.html
+
+      - run: conan install --require gst-plugins-rs/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
+      - run: conan test recipes/gst-plugins-rs/all/test_package gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
+      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conan-graph-linux-${{ matrix.version }}-${{ matrix.shared }}
+          path: '*.html'
