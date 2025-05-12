@@ -1,0 +1,16 @@
+diff --git a/subprojects/gst-plugins-bad/ext/zxing/gstzxing.cpp b/subprojects/gst-plugins-bad/ext/zxing/gstzxing.cpp
+index 7f8118c258..b5aadeda65 100644
+--- a/subprojects/gst-plugins-bad/ext/zxing/gstzxing.cpp
++++ b/subprojects/gst-plugins-bad/ext/zxing/gstzxing.cpp
+@@ -435,11 +435,7 @@ gst_zxing_transform_frame_ip (GstVideoFilter * vfilter, GstVideoFrame * frame)
+   if (result.isValid ()) {
+     GST_DEBUG_OBJECT (zxing, "Symbol found. Text: %s Format: %s",
+         result.text ().c_str (),
+-#if ZXING_VERSION_MAJOR >= 2
+         ToString (result.format ()).c_str ());
+-#else
+-        ToString (result.format ()));
+-#endif
+   } else {
+     goto out;
+   }
