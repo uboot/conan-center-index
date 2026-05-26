@@ -141,3 +141,7 @@ venv.bak/
 Session.vim
 *~
 .undodir
+
+src/
+build/
+build-*/
