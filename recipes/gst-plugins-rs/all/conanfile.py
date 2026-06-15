@@ -195,7 +195,6 @@ class GStPluginsRsConan(ConanFile):
         self._define_rust_env(env, "host")
         if cross_building(self):
             self._define_rust_env(env, "build")
-            env.define_path("CARGO_HOME", os.path.join(self.build_folder, "cargo"))
         env.vars(self).save_script("cargo_paths")
 
         def feature(v):
