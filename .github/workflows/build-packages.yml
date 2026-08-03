@@ -19,14 +19,22 @@ jobs:
             windows-deps-
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-windows
-      - run: conan remote add cci .
 
-      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update
+      - run: conan export recipes/gst-orc/all --version 0.4.42
+      - run: conan export recipes/json-glib/all --version 1.10.6
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update -f=json --out-file=static.json
         # continue-on-error: true
         # timeout-minutes: 180
-      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o *:shared=True --update -f=json --out-file=shared.json
+      - run: conan list --graph=static.json --graph-binaries=Download -f=json --out-file=static-downloaded.json
+      - run: conan list --graph=shared.json --graph-binaries=Download -f=json --out-file=shared-downloaded.json
+      - run: conan remove --list=static-downloaded.json --confirm
+      - run: conan remove --list=shared-downloaded.json --confirm
+
+      - run: conan export recipes/rust/all --version 1.95.0
+      - run: conan export recipes/cargo-c/all --version 0.10.22
       - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
-      - run: conan remove '*' --lru=1d --confirm
+      
       - run: conan cache clean '*'
 
       # - run: conan remove 'msys*' --confirm
@@ -64,17 +72,13 @@ jobs:
             windows-deps-
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-windows
-      - run: conan remote add cci .
 
-      - run: conan install --require gstreamer/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
-      - run: conan test recipes/gstreamer/all/test_package gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
-      - run: conan graph info --require gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} --format html > gstreamer.html
+      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
+      - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
-      - run: conan install --require gst-plugins-rs/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
+      - run: conan create recipes/gst-plugins-rs/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
         if: ${{ matrix.shared == 'True' }}
-      - run: conan test recipes/gst-plugins-rs/all/test_package gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
-        if: ${{ matrix.shared == 'True' }}
-      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
+      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
         if: ${{ matrix.shared == 'True' }}
 
       - uses: actions/upload-artifact@v4
@@ -108,12 +112,20 @@ jobs:
           libxcb-ewmh-dev libxcb-res0-dev libxcb-util-dev libxcb-util0-dev libva-dev
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-linux
-      - run: conan remote add cci .
 
-      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update
-      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan export recipes/gst-orc/all --version 0.4.42
+      - run: conan export recipes/json-glib/all --version 1.10.6
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update -f=json --out-file=static.json
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o *:shared=True --update -f=json --out-file=shared.json
+      - run: conan list --graph=static.json --graph-binaries=Download -f=json --out-file=static-downloaded.json
+      - run: conan list --graph=shared.json --graph-binaries=Download -f=json --out-file=shared-downloaded.json
+      - run: conan remove --list=static-downloaded.json --confirm
+      - run: conan remove --list=shared-downloaded.json --confirm
+
+      - run: conan export recipes/rust/all --version 1.95.0
+      - run: conan export recipes/cargo-c/all --version 0.10.22
       - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
-      - run: conan remove '*' --lru=1d --confirm
+
       - run: conan cache clean '*'
 
       # - run: conan cache save '*:*'
@@ -163,15 +175,12 @@ jobs:
           libxcb-ewmh-dev libxcb-res0-dev libxcb-util-dev libxcb-util0-dev libva-dev
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-linux
-      - run: conan remote add cci .
 
-      - run: conan install --require gstreamer/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
-      - run: conan test recipes/gstreamer/all/test_package gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }}
-      - run: conan graph info --require gstreamer/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} --format html > gstreamer.html
+      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
+      - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
-      - run: conan install --require gst-plugins-rs/${{ matrix.version }} --build missing -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
-      - run: conan test recipes/gst-plugins-rs/all/test_package gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }}
-      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o glib/*:shared=${{ matrix.shared }} -o gstreamer/*:shared=${{ matrix.shared }} -o gst-plugins-rs/*:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
+      - run: conan create recipes/gst-plugins-rs/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
+      - run: conan graph info --require gst-plugins-rs/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gst-plugins-rs.html
 
       - uses: actions/upload-artifact@v4
         with:
