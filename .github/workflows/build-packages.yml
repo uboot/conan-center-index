@@ -18,13 +18,10 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-windows
-      
-      - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=True
-      - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=False
-      - run: conan create recipes/json-glib/all --version 1.10.6 -o *:shared=${{ matrix.shared }}
-      - run: conan install --requires theora/1.1.1 -o *:shared=${{ matrix.shared }} --build theora/1.1.1
-      - run: conan install --requires libnice/0.1.23 -o *:shared=${{ matrix.shared }} --build libnice/0.1.23
-      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
+
+      - run: conan export recipes/gst-orc/all --version 0.4.42
+      - run: conan export recipes/json-glib/all --version 1.10.6
+      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }} --build missing
       - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
       - uses: actions/upload-artifact@v4
@@ -58,12 +55,9 @@ jobs:
       - run: pip install conan==2.31.1
       - run: conan config install --type dir conan-config-linux
 
-      - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=True
-      - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=False
-      - run: conan create recipes/json-glib/all --version 1.10.6 -o *:shared=${{ matrix.shared }}
-      - run: conan install --requires theora/1.1.1 -o *:shared=${{ matrix.shared }} --build theora/1.1.1
-      - run: conan install --requires libnice/0.1.23 -o *:shared=${{ matrix.shared }} --build libnice/0.1.23
-      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
+      - run: conan export recipes/gst-orc/all --version 0.4.42
+      - run: conan export recipes/json-glib/all --version 1.10.6
+      - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }} --build missing
       - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
       - uses: actions/upload-artifact@v4
