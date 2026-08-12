@@ -22,6 +22,7 @@ gstreamer/*:with_libdrm=True
 
 gstreamer/*:ogg=True
 gstreamer/*:opus=True
+gstreamer/*:theora=True
 gstreamer/*:vorbis=True
 gstreamer/*:with_libjpeg=libjpeg
 gstreamer/*:with_libpng=True
