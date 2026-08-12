@@ -1,3 +1,5 @@
+## gstreamer-dev
+
 - package test of msys2/cci.latest fails after initial build (it succeeded
   during the initial build?)
 - gst-plugins-good fail because `hls` is required even if
@@ -68,3 +70,18 @@
 - Set `gst-plugins-rs/*:validate=False` because the GStreamer devtools are not
   built by the `gstreamer` package. An option `gstreamer:devtools` should be
   implemented at some point
+
+## use-cci
+
+- `libnice/0.1.23` is only available for `glib/2.85.3` (as opposed to `2.86`).
+  This blocks WebRTC plugins
+- There are *no* pre-built packages for `theora/1.1.1`. This blocks `-o theora`
+- The `orcc` compiler and the Qt build tools (`moc`, `qrc`, etc.) must be
+  required as *tool* dependency to be available and runnable at build time.
+  "Runnable" means that they can be found in the current path (as setup by
+  Conan) in the configure and build steps. To make sure this approach works, the
+  GStreamer build has to pick up the build tools by querying programs in the
+  current path; using the `pkg-config` will instead lead to the *build*
+  dependency of the same name (which are also required for both, `gst-orc` and
+  `qt`). For Qt the GStreamer build has to be patched to make sure the `tool`
+  lookup does *not* use `pkg-config`
