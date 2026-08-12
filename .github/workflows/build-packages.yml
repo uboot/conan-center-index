@@ -23,6 +23,7 @@ jobs:
       - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=False
       - run: conan create recipes/json-glib/all --version 1.10.6 -o *:shared=${{ matrix.shared }}
       - run: conan install --requires theora/1.1.1 -o *:shared=${{ matrix.shared }} --build theora/1.1.1
+      - run: conan install --requires libnice/0.1.23 -o *:shared=${{ matrix.shared }} --build libnice/0.1.23
       - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
       - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
@@ -61,6 +62,7 @@ jobs:
       - run: conan create recipes/gst-orc/all --version 0.4.42 -o *:shared=False
       - run: conan create recipes/json-glib/all --version 1.10.6 -o *:shared=${{ matrix.shared }}
       - run: conan install --requires theora/1.1.1 -o *:shared=${{ matrix.shared }} --build theora/1.1.1
+      - run: conan install --requires libnice/0.1.23 -o *:shared=${{ matrix.shared }} --build libnice/0.1.23
       - run: conan create recipes/gstreamer/all --version ${{ matrix.version }} -o *:shared=${{ matrix.shared }}
       - run: conan graph info --require gstreamer/${{ matrix.version }} -o *:shared=${{ matrix.shared }} --format html > gstreamer.html
 
