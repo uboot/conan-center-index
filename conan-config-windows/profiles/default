@@ -15,6 +15,7 @@ gstreamer/*:with_libpng=True
 gstreamer/*:dtls=True
 gstreamer/*:sctp=True
 gstreamer/*:srtp=True
+gstreamer/*:webrtc=True
 
 gstreamer/*:with_gl=True
 gstreamer/*:with_egl=True
