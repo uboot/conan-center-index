@@ -1,3 +1,5 @@
+## gstreamer-dev
+
 - package test of msys2/cci.latest fails after initial build (it succeeded
   during the initial build?)
 - gst-plugins-good fail because `hls` is required even if
@@ -68,3 +70,10 @@
 - Set `gst-plugins-rs/*:validate=False` because the GStreamer devtools are not
   built by the `gstreamer` package. An option `gstreamer:devtools` should be
   implemented at some point
+
+## use-cci
+
+- `libnice/0.1.23` is only available for `glib/2.85.3` (as opposed to `2.86`).
+  This blocks WebRTC plugins
+- There are *no* pre-built packages for `theora/1.1.1`. This blocks `-o theora`
+
