@@ -27,3 +27,15 @@ gstreamer/*:theora=True
 gstreamer/*:vorbis=True
 gstreamer/*:with_libjpeg=libjpeg
 gstreamer/*:with_libpng=True
+
+gstreamer/*:flac=True
+gstreamer/*:icydemux=True
+gstreamer/*:isomp4=True
+gstreamer/*:jpeg=True
+gstreamer/*:lame=True
+gstreamer/*:matroska=True
+gstreamer/*:mpg123=True
+gstreamer/*:png=True
+gstreamer/*:soup=True
+gstreamer/*:taglib=True
+gstreamer/*:vpx=True
