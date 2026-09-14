@@ -21,10 +21,10 @@ jobs:
       - run: conan config install --type dir conan-config-windows
       - run: conan remote add cci .
 
-      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing --update
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update
         # continue-on-error: true
         # timeout-minutes: 180
-      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
       - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
       - run: conan remove '*' --lru=1d --confirm
       - run: conan cache clean '*'
@@ -43,7 +43,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        version: ["1.26.11", "1.28.6"]
+        version: ["1.26.11", "1.28.7"]
         shared: ["True", "False"]
     needs: windows-deps
     steps:
@@ -110,8 +110,8 @@ jobs:
       - run: conan config install --type dir conan-config-linux
       - run: conan remote add cci .
 
-      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing --update
-      - run: conan install recipes/gstreamer/all --version 1.28.6 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing --update
+      - run: conan install recipes/gstreamer/all --version 1.28.7 --build missing -o glib/*:shared=False -o gstreamer/*:shared=False --update
       - run: conan install --tool-requires rust/[^1.93] --tool-requires cargo-c/[^0.10] --build missing --update
       - run: conan remove '*' --lru=1d --confirm
       - run: conan cache clean '*'
@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        version: ["1.26.11", "1.28.6"]
+        version: ["1.26.11", "1.28.7"]
         shared: ["True", "False"]
     needs: linux-deps
     steps:
