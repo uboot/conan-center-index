@@ -1,12 +1,12 @@
 sources:
-  "1.28.6":
-    url: "https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/1.28.6/gstreamer-1.28.6.tar.bz2"
-    sha256: "fd51f0e32fded3f78ed31eab94a7e41b1cd56763abc853f6fd03d740d8bc4b90"
+  "1.28.7":
+    url: "https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/1.28.7/gstreamer-1.28.7.tar.bz2"
+    sha256: "4aabbbf88837a592d425c592c852c577359df65f62c2f58d57db7695d6ebbaa8"
   "1.26.11":
     url: "https://gitlab.freedesktop.org/gstreamer/gstreamer/-/archive/1.26.11/gstreamer-1.26.11.tar.bz2"
     sha256: "2bb1741990d09d593e1fe1cb9d4493ec7ec1f6f56c7e80c7b854696e7e91afd2"
 patches:
-  "1.28.6":
+  "1.28.7":
     - patch_file: "patches/1.28/001-use-conan-deps.patch"
   "1.26.11":
     - patch_file: "patches/1.26/001-use-conan-deps.patch"
