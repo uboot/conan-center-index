@@ -404,7 +404,7 @@ class GStreamerConan(ConanFile):
         if self.options.good:
             if self.options.get_safe("with_asm"):
                 self.tool_requires("nasm/[^2.16]")
-        if self._with_qt and not can_run(self):
+        if self._with_qt:
             self.tool_requires("qt/<host_version>", options={
                 **self._qt_options,
                 "qttools": True
@@ -624,7 +624,7 @@ class GStreamerConan(ConanFile):
                 good_options["hls-crypto"] = "openssl"
 
             # Qt plugin options
-            good_options["qt-method"] = "pkg-config"
+            good_options["qt-method"] = "config-tool"
             good_options["qt-egl"] = feature(self.options.get_safe("with_egl"))
             good_options["qt-wayland"] = feature(self.options.get_safe("with_wayland"))
             good_options["qt-x11"] = feature(self.options.get_safe("with_xorg"))
