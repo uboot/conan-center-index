@@ -12,17 +12,10 @@ qt/*:compiler.cppstd=gnu20
 [options]
 gstreamer/*:with_orc=True
 gstreamer/*:i18n=True
-gstreamer/*:with_libjpeg=libjpeg
-gstreamer/*:with_libpng=True
-gstreamer/*:dtls=True
-gstreamer/*:sctp=True
-gstreamer/*:srtp=True
-gstreamer/*:webrtc=True
 
+gstreamer/*:with_libdrm=True
 gstreamer/*:with_gl=True
 gstreamer/*:with_egl=True
-gstreamer/*:with_libdrm=True
-
 gstreamer/*:ogg=True
 gstreamer/*:opus=True
 gstreamer/*:theora=True
@@ -30,6 +23,7 @@ gstreamer/*:vorbis=True
 gstreamer/*:with_libjpeg=libjpeg
 gstreamer/*:with_libpng=True
 
+gstreamer/*:qt6=True
 gstreamer/*:flac=True
 gstreamer/*:icydemux=True
 gstreamer/*:isomp4=True
@@ -41,7 +35,34 @@ gstreamer/*:png=True
 gstreamer/*:soup=True
 gstreamer/*:taglib=True
 gstreamer/*:vpx=True
-gstreamer/*:qt6=True
+
+# gstreamer/*:aes=True
+# gstreamer/*:analyticsoverlay=True
+# gstreamer/*:bz2=True
+# gstreamer/*:closedcaption=True
+# gstreamer/*:codec2json=True
+# gstreamer/*:colormanagement=True
+# gstreamer/*:dash=True
+gstreamer/*:dtls=True
+# gstreamer/*:libde265=True
+# gstreamer/*:openexr=True
+# gstreamer/*:openh264=True
+# gstreamer/*:openjpeg=True
+# gstreamer/*:opus=True
+# gstreamer/*:qroverlay=True
+# gstreamer/*:nvcodec=True
+gstreamer/*:sctp=True
+# gstreamer/*:smoothstreaming=True
+# gstreamer/*:srt=True
+gstreamer/*:srtp=True
+# gstreamer/*:svtav1=True
+# gstreamer/*:ttml=True
+# gstreamer/*:vulkan=True
+# gstreamer/*:webp=True
+gstreamer/*:webrtc=True
+# gstreamer/*:onnx=True
+# gstreamer/*:x264=True
+# gstreamer/*:x265=True
 
 qt/*:openssl=False
 qt/*:with_pcre2=True
